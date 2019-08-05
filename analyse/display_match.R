@@ -33,13 +33,13 @@ datamatch <- read.table(match, sep=space_separator)
 
 # Append the dataframe with a column with ones
 dataframe1 <- data.frame(
-	datapoints1, 1
+	datapoints1, 0
 )
 names(dataframe1) <- c("x","y","index")
 
 # Append the dataframe with a column with twos
 dataframe2 <- data.frame(
-	datapoints2, 2
+	datapoints2, 1
 )
 names(dataframe2) <- c("x","y","index")
 
@@ -75,11 +75,16 @@ fframe <- cbind(product, matchframe)
 
 names(fframe) <- c("x0", "y0", "x1", "y1", "weight");
 
+# Make sure the colors are in the same "scale" as the indices in the dataframe (from 0 to 1)
+fframe$color <- fframe$weight
+
 top_n <- 100
 
 fmax <- data.frame ( 
 	fframe[which.maxn(fframe$weight, n=top_n),]
 )
+
+head(fmax$color,n=top_n)
 
 pdf(NULL)
 
@@ -87,7 +92,8 @@ p <- ggplot() +
 	geom_point(data=dataframe, aes(x=x, y=y, color=index)) + 
 	xlab("") + ylab("") +
 	theme(legend.position="none") +
-	geom_segment(aes(x=x0, y=y0, xend = x1, yend = y1, color=weight), data = fmax)
+	geom_segment(aes(x=x0, y=y0, xend = x1, yend = y1, color=color), data = fmax) #+
+#	scale_fill_gradient(low="blue", high="red")
 
 bold.text <- element_text(face = "bold")
 

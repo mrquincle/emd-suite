@@ -29,6 +29,17 @@ Run in the `analyse` directory:
 
 	./display_match.m ../build/cloud1.txt ../build/cloud2.txt ../build/match.txt
 
+The `R` scripts (using `ggplot2`) lead to visualization that are a little bit more beautiful than the `octave` scripts:
+
+	./display_match.R ../build/cloud1.txt ../build/cloud2.txt ../build/match.txt
+
+An example of the **EMD** variant using a mean-shift approach is shown here:
+
+![EMD mean-shift](docs/match.png)
+
+Note how the structure is preserved. The source square in the middle maps to the target squares (bottom-left and top-right).
+The corners map neatly to the corners of these objects.
+
 # Copyrights
 
 Copyrights belong to A.C. van Rossum (2019)
