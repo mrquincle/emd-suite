@@ -22,7 +22,7 @@ void emd_meanshift(int b, int n, int m, const float * xy1, const float * xy2, fl
 }
 
 void emd_global_offset(int b, int n, int m, const float * xy1, const float * xy2, float * match, 
-    float offset1, float offset2) {
+    float * offset1, float * offset2) {
 
   for (int i=0;i<b;i++){
 
@@ -48,8 +48,8 @@ void emd_global_offset(int b, int n, int m, const float * xy1, const float * xy2
 	double y1=xy1[k*dim+1];
 	// this iterates over all points, they all have the same offset
 	for (int l=0;l<m;l++){
-	  double dx=(x1-xy2[l*dim+0]) - (offset1 - offset2);
-	  double dy=(y1-xy2[l*dim+1]) - (offset1 - offset2);
+	  double dx=(x1-xy2[l*dim+0]) - (offset1[dim+0] - offset2[dim+0]);
+	  double dy=(y1-xy2[l*dim+1]) - (offset1[dim+1] - offset2[dim+1]);
 
 	  // this is not sparse, that's why almost any point wants to contribute to other points
 	  // even if there distance is not small
@@ -237,7 +237,7 @@ void emd_costs(int b, int n, int m, float * xy1, float * xy2, float * match, flo
 }
 
 void emd_mean_costs_global_offsets(int b, int n, int m, float * xy1, float * xy2, float * match, 
-    float offset1, float offset2, float * cost) {
+    float * offset1, float * offset2, float * cost) {
 
   *cost = 0;
   for (int i=0;i<b;i++){
@@ -246,8 +246,8 @@ void emd_mean_costs_global_offsets(int b, int n, int m, float * xy1, float * xy2
       for (int k=0;k<m;k++){
 	float x1=xy1[j*dim+0];
 	float y1=xy1[j*dim+1];
-	float dx=(x1 - xy2[k*dim+0]) - (offset1 - offset2);
-	float dy=(y1 - xy2[k*dim+1]) - (offset1 - offset2);
+	float dx=(x1 - xy2[k*dim+0]) - (offset1[dim+0] - offset2[dim+0]);
+	float dy=(y1 - xy2[k*dim+1]) - (offset1[dim+1] - offset2[dim+1]);
 	float d=sqrtf(dx*dx+dy*dy)*match[j*m+k];
 	s+=d;
       }
