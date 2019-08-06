@@ -234,7 +234,7 @@ int main() {
     //	  std::cout << "Offset cloud 2 [i,j]=[" << i << "," << j << "] -> [" << offset2[j*dim+0] << "," << offset2[j*dim+1] << "]" << std::endl;
   }
 
-  matchcost_cpu(b, n, m, xy1, xy2, match, offset1, offset2, cost);
+  emd_costs(b, n, m, xy1, xy2, match, offset1, offset2, cost);
   std::cout << "Cost: " << cost[0]/n << std::endl;
 
   delete [] xy1;

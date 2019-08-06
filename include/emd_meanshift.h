@@ -10,6 +10,12 @@ void emd_meanshift(int b, int n, int m, const float * xy1, const float * xy2, fl
     float * offset1, float * offset2);
 
 /**
+ * Same offset for all points in the same cloud.
+ */
+void emd_global_offset(int b, int n, int m, const float * xy1, const float * xy2, float * match, 
+    float offset1, float offset2);
+
+/**
  * Paper: https://arxiv.org/pdf/1612.00603.pdf
  *
  * d_EMD(S1,S2) = min_\phi \sum_{x \in S1} || x - phi(x) ||_2
@@ -43,7 +49,7 @@ void emd_meanshift(int b, int n, int m, const float * xy1, const float * xy2, fl
  * @param offset1  matrix of size n * dim. 
  * @param offset2  matrix of size m * dim. 
  */
-void approxmatch_cpu(int b, int n, int m, const float * xy1, const float * xy2, float * match, 
+void emd_standard(int b, int n, int m, const float * xy1, const float * xy2, float * match, 
     float * offset1, float * offset2);
 
 /**
@@ -68,5 +74,8 @@ void approxmatch_cpu(int b, int n, int m, const float * xy1, const float * xy2, 
  * @param offset2  matrix of size m * dim. 
  * @param cost     result, for each matching point, calculate euclidean distance and calculate the overall sum
  */
-void matchcost_cpu(int b, int n, int m, float * xy1, float * xy2, float * match,
+void emd_costs(int b, int n, int m, float * xy1, float * xy2, float * match,
     float * offset1, float * offset2, float * cost);
+
+void emd_mean_costs_global_offsets(int b, int n, int m, float * xy1, float * xy2, float * match, 
+    float offset1, float offset2, float * cost);
