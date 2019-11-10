@@ -6,7 +6,7 @@ args = commandArgs(trailingOnly=TRUE)
 # It should have three columns, x, y and class
 # The last column will be used for coloring
 
-separator <- ','
+separator <- '\t'
 
 library(ggplot2)
 
