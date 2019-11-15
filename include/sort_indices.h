@@ -1,5 +1,6 @@
 #pragma once
-/*
+
+/**
  * Obtain indices of values in ascending order.
  */
 void argsort(int n, const float* values, int *indices);
@@ -19,3 +20,7 @@ void subtract_mean(int n, float* values, const int *indices, int k);
  */
 void calc_offset(int n, const float *xy, float *offset);
 
+/**
+ * Calculate global shift (mean)
+ */
+void calc_global_offset(int n, const float *xy, float *offset);

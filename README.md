@@ -15,9 +15,9 @@ Build:
 
 Run in the `build` directory:
 
-	./emd-suite
+	./emd-suite --method shift
 
-This will generate several `.txt` files.
+This will generate several `.txt` files in the `output/shift` directory. The other method option is `default`.
 
 ## Visualization
 

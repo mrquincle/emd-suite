@@ -4,8 +4,11 @@
 #include <math.h>
 #include <cassert>
 #include <fstream>
-
+#include <sys/stat.h> 
 #include <emd_meanshift.h>
+
+// Check the split from one to two clusters
+//#define TWO_CLUSTERS
 
 typedef struct _square_cfg {
   float scale[2];
@@ -87,12 +90,42 @@ void create_square(const int n, const square_cfg_t & square_cfg, float *pnts) {
 /**
  * Test approximation of earth mover's distance
  */
-int main() {
+int main(int argc, char **argv) {
 
-  printf("Algorithm where k is determined in a flexible way.\n");
+  // very simple way to check one argument "--method"
+  if (argc < 3) {
+    std::cout << "Usage: " << argv[0] << "--method METHOD" << std::endl;
+    std::cout << "  wrong number of arguments" << std::endl;
+    exit(1);
+  }
 
-  int seed = 1213;
-  seed = time(NULL);
+  std::string method_key = std::string(argv[1]);
+  std::string method_value = std::string(argv[2]);
+
+  if (method_key != "--method") {
+    std::cout << "Usage: " << argv[0] << "--method METHOD" << std::endl;
+    std::cout << "  wrong second argument: " << method_key << std::endl;
+    exit(1);
+  }
+  
+  if (method_value == "default") {
+    std::cout << "Run default emd algorithm" << std::endl;
+  }
+  else if (method_value == "shift") {
+    std::cout << "Run shift-emd algorithm where k is determined in a flexible way." << std::endl;
+  }
+  else if (method_value == "global") {
+    std::cout << "Run global shift-emd algorithm." << std::endl;
+  } 
+  else {
+    std::cout << "Usage: " << argv[0] << "--method METHOD" << std::endl;
+    std::cout << "  unknown method: " << method_value << std::endl;
+    exit(1);
+  }
+
+  //int seed = 1234567;
+  int seed = 11111;
+ // seed = time(NULL);
   srand48(seed);
 
   float *xy1, *xy2, *match, *cost, *offset1, *offset2;
@@ -125,8 +158,6 @@ int main() {
   squareB_cfg.translation[0] = 3;
   squareB_cfg.translation[1] = 2;
 
-#define TWO_CLUSTERS
-
 #ifdef TWO_CLUSTERS
   square_cfg_t squareC_cfg;
   squareC_cfg.scale[0] = 1;
@@ -140,9 +171,33 @@ int main() {
   create_square(n, squareB_cfg, xy2);
 #endif
 
+#ifdef TWO_CLUSTERS
+  std::string ofolder = "two_clusters";
+#else
+  std::string ofolder = "single_cluster";
+#endif
+  if (mkdir(ofolder.c_str(), 0777) == -1) {
+    if( errno == EEXIST ) {
+      std::cout << "Output directory exists, files in it might be overwritten." << std::endl;
+    } else {
+      std::cerr << "Could not create output directory: " << ofolder << std::endl;
+      exit(2);
+    }
+  }
+  std::string ofoldermethod = ofolder + '/' + method_value;
+  if (mkdir(ofoldermethod.c_str(), 0777) == -1) {
+    if( errno == EEXIST ) {
+      std::cout << "Output directory exists, files in it might be overwritten." << std::endl;
+    } else {
+      std::cerr << "Could not create output directory: " << ofoldermethod << std::endl;
+      exit(2);
+    }
+  }
+  std::string fprefix = std::string(ofolder + '/' + method_value + '/');
+
   std::cout << "Write point cloud 1 to file" << std::endl;
   std::ofstream cloud1;
-  cloud1.open("cloud1.txt");
+  cloud1.open(fprefix + "cloud1.txt");
   for (int i = 0; i < n; ++i) {
     cloud1 << std::fixed << std::setprecision(5) << xy1[i*dim] << "," << xy1[i*dim+1] << std::endl;
   }
@@ -150,7 +205,7 @@ int main() {
 
   std::cout << "Write point cloud 2 to file" << std::endl;
   std::ofstream cloud2;
-  cloud2.open("cloud2.txt");
+  cloud2.open(fprefix + "cloud2.txt");
   for (int i = 0; i < n; ++i) {
     cloud2 << std::fixed << std::setprecision(5) << xy2[i*dim] << "," << xy2[i*dim+1] << std::endl;
   }
@@ -170,11 +225,19 @@ int main() {
     //	std::cout << std::endl;
   }
 
-  emd_meanshift(b, n, m, xy1, xy2, match, offset1, offset2);
+  if (method_value == "default") {
+    emd_standard(b, n, m, xy1, xy2, match, offset1, offset2);
+  }
+  else if (method_value == "shift") {
+    emd_meanshift(b, n, m, xy1, xy2, match, offset1, offset2);
+  } 
+  else if (method_value == "global") {
+    emd_global_offset(b, n, m, xy1, xy2, match, offset1, offset2);
+  }
 
   std::cout << "Write offset cloud 1 to file" << std::endl;
   std::ofstream foffset1;
-  foffset1.open("offset1.txt");
+  foffset1.open(fprefix + "offset1.txt");
   for (int i = 0; i < n; ++i) {
     foffset1 << std::fixed << std::setprecision(5) << offset1[i*dim] << "," << offset1[i*dim+1] << std::endl;
   }
@@ -182,7 +245,7 @@ int main() {
 
   std::cout << "Write offset cloud 2 to file" << std::endl;
   std::ofstream foffset2;
-  foffset2.open("offset2.txt");
+  foffset2.open(fprefix + "offset2.txt");
   for (int i = 0; i < n; ++i) {
     foffset2 << std::fixed << std::setprecision(5) << offset2[i*dim] << "," << offset2[i*dim+1] << std::endl;
   }
@@ -200,7 +263,7 @@ int main() {
   //std::cout << std::endl;
   //std::cout << "Match: " << std::endl;
   std::ofstream fmatch;
-  fmatch.open("match.txt");
+  fmatch.open(fprefix + "match.txt");
   for (int i = 0; i < m; ++i) {
     for (int j = 0; j < n; ++j) {
       //		std::cout << std::fixed << std::setprecision(4) << match[i*m+j] << ' ';
@@ -234,7 +297,12 @@ int main() {
     //	  std::cout << "Offset cloud 2 [i,j]=[" << i << "," << j << "] -> [" << offset2[j*dim+0] << "," << offset2[j*dim+1] << "]" << std::endl;
   }
 
-  emd_costs(b, n, m, xy1, xy2, match, offset1, offset2, cost);
+  if (method_value == "global") {
+    emd_mean_costs_global_offset(b, n, m, xy1, xy2, match, offset1, offset2, cost);
+  }
+  else {
+    emd_costs(b, n, m, xy1, xy2, match, offset1, offset2, cost);
+  }
   std::cout << "Cost: " << cost[0]/n << std::endl;
 
   delete [] xy1;

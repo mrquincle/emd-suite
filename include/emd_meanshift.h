@@ -13,7 +13,7 @@ void emd_meanshift(int b, int n, int m, const float * xy1, const float * xy2, fl
  * Same offset for all points in the same cloud.
  */
 void emd_global_offset(int b, int n, int m, const float * xy1, const float * xy2, float * match, 
-    float offset1, float offset2);
+    float * offset1, float * offset2);
 
 /**
  * Paper: https://arxiv.org/pdf/1612.00603.pdf
@@ -77,5 +77,5 @@ void emd_standard(int b, int n, int m, const float * xy1, const float * xy2, flo
 void emd_costs(int b, int n, int m, float * xy1, float * xy2, float * match,
     float * offset1, float * offset2, float * cost);
 
-void emd_mean_costs_global_offsets(int b, int n, int m, float * xy1, float * xy2, float * match, 
-    float offset1, float offset2, float * cost);
+void emd_mean_costs_global_offset(int b, int n, int m, float * xy1, float * xy2, float * match, 
+    float * offset1, float * offset2, float * cost);

@@ -23,6 +23,9 @@ void emd_meanshift(int b, int n, int m, const float * xy1, const float * xy2, fl
 
 void emd_global_offset(int b, int n, int m, const float * xy1, const float * xy2, float * match, 
     float * offset1, float * offset2) {
+  
+  calc_global_offset(n, xy1, offset1);
+  calc_global_offset(m, xy2, offset2);
 
   for (int i=0;i<b;i++){
 
@@ -236,7 +239,7 @@ void emd_costs(int b, int n, int m, float * xy1, float * xy2, float * match, flo
   }
 }
 
-void emd_mean_costs_global_offsets(int b, int n, int m, float * xy1, float * xy2, float * match, 
+void emd_mean_costs_global_offset(int b, int n, int m, float * xy1, float * xy2, float * match, 
     float * offset1, float * offset2, float * cost) {
 
   *cost = 0;

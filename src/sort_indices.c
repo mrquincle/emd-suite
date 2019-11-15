@@ -4,6 +4,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <sort_indices.h>
 
 // dim = 2, visibility limit to compilation unit
@@ -95,6 +96,19 @@ int count_items_below_threshold(int n, const float* values, const int *indices, 
 }
 
 /**
+ * Average. We can ignore indices here.
+ */
+float avg(int n, const float* values, int dim_index) {
+  long double mean = 0;
+  for (int i = 0; i < n; ++i) {
+    mean += values[i * dim + dim_index];
+  }
+  float result = mean/n;
+  printf("Average [dim=%i]: %f\n", dim_index, result);
+  return result;
+}
+
+/**
  * Smoothing average where we calculate a window of size k, with k nearest neighbours. 
  */
 void smoothing_avg(int n, const float* values, const int *indices, float *mean, int k) {
@@ -151,6 +165,22 @@ void dist(const float *p1, const float *p2, float *result) {
 }
 
 //#define FIXED_NEIGHBOURS
+
+/*
+ * Global offset in dim dimensions.
+ */
+void calc_global_offset(int n, const float *xy, float *offset) {
+ 
+  float mean[dim];
+  for (int j = 0; j < dim; ++j) {
+    mean[j] = avg(n, xy, j);
+  }
+  for (int j = 0; j < dim; ++j) {
+    for (int i = 0; i < n; ++i) {
+      offset[i*dim+j] = mean[j];
+    }
+  }
+}
 
 #define FIXED_WINDOW
 

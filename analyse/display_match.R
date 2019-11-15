@@ -90,6 +90,7 @@ pdf(NULL)
 
 p <- ggplot() +
 	geom_point(data=dataframe, aes(x=x, y=y, color=index)) + 
+	coord_fixed() + 
 	xlab("") + ylab("") +
 	theme(legend.position="none") +
 	geom_segment(aes(x=x0, y=y0, xend = x1, yend = y1, color=color), data = fmax) #+
